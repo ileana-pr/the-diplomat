@@ -1,0 +1,14 @@
+{
+  "name": "the-diplomat",
+  "version": "0.1.0",
+  "description": "A personal civic feed: your county, state and federal representatives in one place.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
+  }
+}

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Diplomat</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="/" aria-label="The Diplomat home">
+        <img src="/favicon.svg" alt="" width="28" height="28" />
+        <span>The Diplomat</span>
+      </a>
+      <form id="addr-form" class="addr-form" role="search">
+        <label for="address" class="sr-only">Your home address</label>
+        <input id="address" name="address" autocomplete="street-address" placeholder="Your street address, city, state ZIP" required />
+        <button type="submit">Show my feed</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="welcome" class="welcome">
+      <h1>What your government did, for your address.</h1>
+      <p>Enter your home address to see your county supervisors, state legislators and members of Congress, how they voted, and what they sponsored, in one feed.</p>
+      <p class="fine">Your address is only used to look up your districts with the U.S. Census geocoder. It's saved in this browser so you don't have to retype it.</p>
+    </section>
+
+    <section id="loading" class="loading" hidden>
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Looking up your districts and gathering votes, bills and meetings. This can take 10 to 20 seconds the first time.</p>
+    </section>
+
+    <section id="error" class="error" hidden role="alert"></section>
+
+    <section id="results" hidden>
+      <div id="location" class="location"></div>
+      <div class="layout">
+        <aside class="reps">
+          <h2>Your representatives</h2>
+          <div id="reps"></div>
+        </aside>
+        <div class="feed-col">
+          <div class="filters" role="toolbar" aria-label="Filter the feed">
+            <div class="chips" data-group="level">
+              <button class="chip on" data-value="all">Everything</button>
+              <button class="chip" data-value="federal">Federal</button>
+              <button class="chip" data-value="state">State</button>
+              <button class="chip" data-value="county">County</button>
+            </div>
+            <div class="chips" data-group="kind">
+              <button class="chip on" data-value="all">All activity</button>
+              <button class="chip" data-value="vote">Votes</button>
+              <button class="chip" data-value="bill">Bills</button>
+              <button class="chip" data-value="local">Meetings &amp; news</button>
+            </div>
+          </div>
+          <div id="person-filter" class="person-filter" hidden></div>
+          <ol id="feed" class="feed"></ol>
+          <details id="sources" class="sources"></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    Data from the U.S. Census Bureau, Congress.gov, the House Clerk, Senate.gov, Open States, the unitedstates/congress-legislators project, and your county's website.
+  </footer>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
