@@ -38,9 +38,7 @@ Put them in `.env`. The site runs without them, with less data.
 
 ## Adding counties
 
-County records go in one list, `data/counties.json`. Separate scripts fill that list by Census GEOID. The file layout and the rules for those scripts are in [docs/data-flow.md](docs/data-flow.md).
-
-The running app still reads the single hand-written entry in `config/counties.js` until that list is wired up.
+County records live in one list, `data/counties.json`. `npm run census` downloads the Census Bureau county file and fills the name and state for every county, including Puerto Rico's municipios. Other fields stay blank until a later script finds them. The file layout and the rules are in [docs/data-flow.md](docs/data-flow.md).
 
 ## Tests
 

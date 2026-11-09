@@ -1,0 +1,23 @@
+{
+  "51137": {
+    "geoid": "51137",
+    "name": "Orange County, Virginia",
+    "state": "VA",
+    "body": "Board of Supervisors",
+    "website": "https://www.orangecountyva.gov/",
+    "boardPage": "https://www.orangecountyva.gov/95/Board-of-Supervisors",
+    "agendasPage": "https://www.orangecountyva.gov/525/Agendas-Minutes",
+    "agendaCenter": "https://www.orangecountyva.gov/AgendaCenter",
+    "agendaRss": "https://www.orangecountyva.gov/RSSFeed.aspx?ModID=65&CID=All-0",
+    "newsRss": "https://www.orangecountyva.gov/RSSFeed.aspx?ModID=1&CID=All-newsflash.xml",
+    "newsPage": "https://www.orangecountyva.gov/CivicAlerts.aspx",
+    "members": [
+      { "name": "J. Jason Capelle", "district": "District One", "url": "https://www.orangecountyva.gov/574/district-one" },
+      { "name": "Ed M. Van Hoven", "district": "District Two", "title": "Vice Chairman", "url": "https://www.orangecountyva.gov/575/district-two" },
+      { "name": "Keith F. Marshall", "district": "District Three", "url": "https://www.orangecountyva.gov/595/district-three" },
+      { "name": "Crystal D. Coleman", "district": "District Four", "url": "https://www.orangecountyva.gov/597/district-four" },
+      { "name": "J. Bryan Nicol", "district": "District Five", "title": "Chairman", "url": "https://www.orangecountyva.gov/600/district-five" }
+    ],
+    "districtMap": "https://www.orangecountyva.gov/574/district-one"
+  }
+}

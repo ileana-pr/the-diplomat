@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { installMockFetch } from './mock-fetch.js';
 import { currentCongress } from '../lib/federal.js';
 import { buildFeed } from '../lib/feed.js';
@@ -10,11 +11,13 @@ import { clearCache } from '../lib/http.js';
 import { beforeEach } from 'node:test';
 
 const emptyStore = path.join(os.tmpdir(), 'diplomat-senate-test');
+const filledCounties = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'counties.json');
 beforeEach(() => {
   clearCache();
   fs.rmSync(emptyStore, { recursive: true, force: true });
   fs.mkdirSync(emptyStore, { recursive: true });
   process.env.SENATE_STORE_DIR = emptyStore;
+  process.env.COUNTIES_FILE = filledCounties;
 });
 
 test('current congress and session', () => {
@@ -92,6 +95,21 @@ test('senate votes fall back to voteview when senate.gov returns 403', async () 
   assert.match(senate.detail, /Voteview/);
   const senVote = data.feed.find((i) => i.kind === 'vote' && i.chamber === 'senate');
   assert.deepEqual(senVote.officials.map((o) => o.position), ['Nay', 'Yea']);
+});
+
+test('a census-only county shows its name and no meetings', async () => {
+  const file = path.join(os.tmpdir(), 'diplomat-counties-census.json');
+  fs.writeFileSync(file, JSON.stringify({ '51137': { geoid: '51137', name: 'Orange County', state: 'VA' } }));
+  process.env.COUNTIES_FILE = file;
+  installMockFetch();
+  const data = await buildFeed('100 Sample St, Orange, VA 22960', { CONGRESS_API_KEY: 'k', OPENSTATES_API_KEY: 'os' });
+  assert.equal(data.county.name, 'Orange County');
+  assert.equal(data.county.state, 'VA');
+  assert.equal(data.officials.county.length, 0);
+  assert.equal(data.feed.some((i) => i.level === 'county'), false);
+  const note = data.sources.find((s) => s.name === 'County agendas & news');
+  assert.equal(note.ok, true, note.detail);
+  assert.match(note.detail, /aren't filled in yet/);
 });
 
 test('a failing source does not break the feed', async () => {

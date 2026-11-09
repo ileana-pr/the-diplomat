@@ -48,16 +48,31 @@ function render() {
   $('#reps').innerHTML = [
     repGroup('federal', 'Congress', officials.federal),
     repGroup('state', g.state === 'VA' ? 'Virginia General Assembly' : 'State legislature', officials.state),
-    repGroup('county', county ? `${county.name.split(',')[0]} ${county.body}` : 'County', officials.county, county),
+    repGroup('county', countyTitle(county), officials.county, county),
   ].join('');
   renderFeed();
   renderSources();
 }
 
+function countyTitle(county) {
+  if (!county?.name) return 'County';
+  const place = county.name.split(',')[0];
+  return county.body ? `${place} ${county.body}` : place;
+}
+
 function repGroup(level, title, list, county) {
   let body = list.map(repCard).join('');
-  if (level === 'county' && !list.length) body = `<p class="placeholder-note">Your county isn't set up yet. It can be added in <code>config/counties.js</code>.</p>`;
-  if (level === 'county' && county) body += `<p class="placeholder-note">Orange County has one supervisor per district. <a href="${esc(county.boardPage)}" target="_blank" rel="noopener">Board page</a> · <a href="${esc(county.agendasPage)}" target="_blank" rel="noopener">Agendas &amp; minutes</a></p>`;
+  if (level === 'county' && !list.length) {
+    body = county
+      ? `<p class="placeholder-note">Board members aren't listed for this county yet.</p>`
+      : `<p class="placeholder-note">This county isn't in the list yet.</p>`;
+  }
+  if (level === 'county' && county && (county.boardPage || county.agendasPage)) {
+    const links = [];
+    if (county.boardPage) links.push(`<a href="${esc(county.boardPage)}" target="_blank" rel="noopener">Board page</a>`);
+    if (county.agendasPage) links.push(`<a href="${esc(county.agendasPage)}" target="_blank" rel="noopener">Agendas &amp; minutes</a>`);
+    body += `<p class="placeholder-note">${links.join(' · ')}</p>`;
+  }
   return `<div class="rep-group"><h3><span class="dot ${level}"></span>${esc(title)}</h3>${body}</div>`;
 }
 
