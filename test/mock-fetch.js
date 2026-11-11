@@ -45,13 +45,6 @@ const osBills = (url) => url.includes('include=votes')
 const agendaHtml = `<a href="/AgendaCenter/ViewFile/Agenda/_10282026-1201">Agenda</a><a href="/AgendaCenter/ViewFile/Minutes/_10142026-1190">Minutes</a><a href="/AgendaCenter/ViewFile/Agenda/_10142026-1190">Agenda</a>`;
 const newsRss = `<rss><channel><item><title>Public hearing scheduled on the sample zoning amendment</title><link>https://www.orangecountyva.gov/CivicAlerts.aspx?AID=9999</link><pubDate>Mon, 02 Nov 2026 14:00:00 GMT</pubDate><description>&lt;p&gt;The Board of Supervisors will hold a public hearing.&lt;/p&gt;</description></item></channel></rss>`;
 
-const voteviewRolls = [{ congress: 119, chamber: 'Senate', rollnumber: 10, date: '2026-09-30', session: 2, clerk_rollnumber: 256, yea_count: 47, nay_count: 41, bill_number: 'PN256', vote_result: 'Nomination Confirmed', vote_desc: 'Confirmation of a sample nominee 256', vote_question: 'On the Nomination PN256' }];
-const voteviewMembers = [
-  { icpsr: 101, state_abbrev: 'VA', bioname: 'SENATORSON, Alex', bioguide_id: 'S000001' },
-  { icpsr: 102, state_abbrev: 'VA', bioname: 'UPPERHOUSE, Jordan', bioguide_id: 'S000002' },
-];
-const voteviewCsv = 'congress,chamber,rollnumber,icpsr,cast_code,prob\n119,Senate,10,101,6,100\n119,Senate,10,102,1,100\n';
-
 export function installMockFetch({ failOpenStates = false, houseIndexMissing = false, blockSenate = false } = {}) {
   const calls = [];
   globalThis.fetch = async (url, opts = {}) => {
@@ -73,9 +66,6 @@ export function installMockFetch({ failOpenStates = false, houseIndexMissing = f
       if (houseIndexMissing && n > 5) return ok('<xml>Error sanitizing file</xml>', 'text/xml');
       return ok(houseRoll(n, n % 2 ? 'Nay' : 'Yea'), 'text/xml');
     }
-    if (url.includes('voteview.com') && url.includes('rollcalls')) return ok(voteviewRolls);
-    if (url.includes('voteview.com') && url.includes('members')) return ok(voteviewMembers);
-    if (url.includes('voteview.com') && url.endsWith('.csv')) return ok(voteviewCsv, 'text/csv');
     if (url.includes('vote_menu_')) {
       if (blockSenate) return new Response('blocked', { status: 403, statusText: 'Forbidden' });
       return ok(senateMenu, 'text/xml');

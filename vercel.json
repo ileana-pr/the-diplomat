@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/feed.js": {
+      "maxDuration": 60,
+      "includeFiles": "data/counties.json"
+    }
+  }
+}

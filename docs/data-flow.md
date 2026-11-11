@@ -76,9 +76,8 @@ the-diplomat/
     raw/                    # Downloads the scripts read. Safe to delete and fetch again.
       2025_Gaz_counties_national.zip  # Census script input.
     http/                   # Saved copies of pages the app has already fetched.
-    senate/                 # Senate roll-call XML, refreshed about once an hour.
 ```
 
-`data/*` is listed in `.gitignore` because `data/http` and `data/senate` are caches this machine can rebuild. `data/counties.json` is the exception: filling websites and feeds means visiting thousands of counties, so the list is committed. `data/raw/` stays ignored.
+`data/*` is listed in `.gitignore` because `data/http` is a cache this machine can rebuild. `data/counties.json` is the exception: filling websites and feeds means visiting thousands of counties, so the list is committed. `data/raw/` stays ignored.
 
 Scripts read `data/raw/` and write `data/counties.json`. The running app reads `data/counties.json` and never reads `data/raw/`.

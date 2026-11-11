@@ -10,13 +10,9 @@ import { buildFeed } from '../lib/feed.js';
 import { clearCache } from '../lib/http.js';
 import { beforeEach } from 'node:test';
 
-const emptyStore = path.join(os.tmpdir(), 'diplomat-senate-test');
 const filledCounties = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'counties.json');
 beforeEach(() => {
   clearCache();
-  fs.rmSync(emptyStore, { recursive: true, force: true });
-  fs.mkdirSync(emptyStore, { recursive: true });
-  process.env.SENATE_STORE_DIR = emptyStore;
   process.env.COUNTIES_FILE = filledCounties;
 });
 
@@ -70,31 +66,14 @@ test('house votes load when the clerk index page is missing', async () => {
   assert.equal(houseVote.officials[0].name, 'Casey Districtseven');
 });
 
-test('saved senate files are used without calling senate.gov', async () => {
-  const { congress, session } = currentCongress();
-  const menu = `<?xml version="1.0"?><vote_summary><votes><vote><vote_number>00256</vote_number></vote></votes></vote_summary>`;
-  const vote = `<?xml version="1.0"?><roll_call_vote><vote_number>00256</vote_number><vote_date>September 30, 2026, 05:30 PM</vote_date><vote_question_text>On the Nomination PN256</vote_question_text><vote_result_text>Nomination Confirmed</vote_result_text><vote_title>Confirmation of a sample nominee 256</vote_title><document><document_name>PN256</document_name></document><count><yeas>47</yeas><nays>41</nays></count><members><member><last_name>Senatorson</last_name><state>VA</state><vote_cast>Nay</vote_cast><lis_member_id>S001</lis_member_id></member><member><last_name>Upperhouse</last_name><state>VA</state><vote_cast>Yea</vote_cast><lis_member_id>S002</lis_member_id></member></members></roll_call_vote>`;
-  fs.writeFileSync(path.join(emptyStore, `vote_menu_${congress}_${session}.xml`), menu);
-  fs.writeFileSync(path.join(emptyStore, `vote_${congress}_${session}_00256.xml`), vote);
-  fs.writeFileSync(path.join(emptyStore, 'status.json'), JSON.stringify({ updatedAt: '2026-09-30T18:00:00Z' }));
-  const calls = installMockFetch({ blockSenate: true });
-  const data = await buildFeed('100 Sample St, Orange, VA 22960', { CONGRESS_API_KEY: 'k', OPENSTATES_API_KEY: 'os' });
-  const senate = data.sources.find((s) => s.name === 'Senate votes');
-  assert.equal(senate.ok, true, senate.detail);
-  assert.match(senate.detail, /saved Senate files/);
-  assert.equal(calls.some((c) => String(c.url).includes('senate.gov') || String(c.url).includes('voteview.com')), false);
-  const senVote = data.feed.find((i) => i.kind === 'vote' && i.chamber === 'senate');
-  assert.deepEqual(senVote.officials.map((o) => o.position), ['Nay', 'Yea']);
-});
-
-test('senate votes fall back to voteview when senate.gov returns 403', async () => {
+test('a senate.gov refusal leaves the rest of the feed', async () => {
   installMockFetch({ blockSenate: true });
   const data = await buildFeed('100 Sample St, Orange, VA 22960', { CONGRESS_API_KEY: 'k', OPENSTATES_API_KEY: 'os' });
   const senate = data.sources.find((s) => s.name === 'Senate votes');
-  assert.equal(senate.ok, true, senate.detail);
-  assert.match(senate.detail, /Voteview/);
-  const senVote = data.feed.find((i) => i.kind === 'vote' && i.chamber === 'senate');
-  assert.deepEqual(senVote.officials.map((o) => o.position), ['Nay', 'Yea']);
+  assert.equal(senate.ok, false, senate.detail);
+  assert.equal(data.feed.some((i) => i.kind === 'vote' && i.chamber === 'senate'), false);
+  const houseVote = data.feed.find((i) => i.kind === 'vote' && i.chamber === 'house');
+  assert.equal(houseVote.officials[0].name, 'Casey Districtseven');
 });
 
 test('a census-only county shows its name and no meetings', async () => {
