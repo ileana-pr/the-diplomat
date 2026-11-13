@@ -8,11 +8,13 @@ import { installMockFetch } from './mock-fetch.js';
 import { currentCongress } from '../lib/federal.js';
 import { buildFeed } from '../lib/feed.js';
 import { clearCache } from '../lib/http.js';
+import { resetSenateStore } from '../lib/senate-db.js';
 import { beforeEach } from 'node:test';
 
 const filledCounties = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'counties.json');
 beforeEach(() => {
   clearCache();
+  resetSenateStore();
   process.env.COUNTIES_FILE = filledCounties;
 });
 
@@ -38,6 +40,7 @@ test('builds a full feed for an Orange County address', async () => {
   assert.equal(houseVote.officials[0].name, 'Casey Districtseven');
   const senVote = data.feed.find((i) => i.kind === 'vote' && i.chamber === 'senate');
   assert.deepEqual(senVote.officials.map((o) => o.position), ['Nay', 'Yea']);
+  assert.equal(data.sources.find((s) => s.name === 'Senate votes').detail, '2 roll calls saved, 2 new');
   assert.ok(!data.feed.some((i) => i.title === undefined), 'amendments are skipped');
   const fedBills = data.feed.filter((i) => i.level === 'federal' && i.billLabel === 'H.R. 4321');
   assert.equal(fedBills.length, 1, 'one card per bill');

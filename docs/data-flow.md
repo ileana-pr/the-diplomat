@@ -66,7 +66,11 @@ the-diplomat/
   server.js                 # HTTP server. One route, /api/feed, builds the feed.
   public/                   # The page the browser loads.
   scripts/census-counties.js  # Downloads the Census county file and fills geoid, name, and state.
+  scripts/db-setup.js       # Creates the database tables.
+  scripts/senate-upload.js  # Uploads vote files in data/senate to the database.
+  db/schema.sql             # The database tables. Senate votes live here.
   lib/                      # Feed building. geo.js, federal.js, state.js, county.js.
+    senate-db.js            # Reads and writes Senate votes in the database.
   test/                     # Sample responses, including an Orange County address.
     fixtures/counties.json  # One filled Orange County record, used only by tests.
   docs/data-flow.md         # This document.
@@ -76,8 +80,9 @@ the-diplomat/
     raw/                    # Downloads the scripts read. Safe to delete and fetch again.
       2025_Gaz_counties_national.zip  # Census script input.
     http/                   # Saved copies of pages the app has already fetched.
+    senate/                 # Senate vote files from an earlier downloader. Input for scripts/senate-upload.js.
 ```
 
-`data/*` is listed in `.gitignore` because `data/http` is a cache this machine can rebuild. `data/counties.json` is the exception: filling websites and feeds means visiting thousands of counties, so the list is committed. `data/raw/` stays ignored.
+`data/*` is listed in `.gitignore` because `data/http` is a cache this machine can rebuild and `data/senate` is already in the database once uploaded. `data/counties.json` is the exception: filling websites and feeds means visiting thousands of counties, so the list is committed. `data/raw/` stays ignored.
 
 Scripts read `data/raw/` and write `data/counties.json`. The running app reads `data/counties.json` and never reads `data/raw/`.

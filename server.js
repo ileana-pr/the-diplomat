@@ -3,17 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleFeed } from './api/feed.js';
+import { loadEnv } from './lib/env.js';
 import { warmSavedHttp } from './lib/http.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 
-// Load .env without any dependencies.
-try {
-  for (const line of fs.readFileSync(path.join(root, '.env'), 'utf8').split(/\r?\n/)) {
-    const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
-  }
-} catch {}
+loadEnv();
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' };
 
@@ -42,5 +37,6 @@ server.listen(port, () => {
   console.log(`The Diplomat is running at http://localhost:${port}`);
   if (!process.env.CONGRESS_API_KEY) console.log('  Tip: add CONGRESS_API_KEY to .env (free at https://api.congress.gov/sign-up/)');
   if (!process.env.OPENSTATES_API_KEY) console.log('  Tip: add OPENSTATES_API_KEY to .env for Virginia General Assembly data');
+  if (!process.env.DATABASE_URL) console.log('  Tip: run `vercel env pull` for DATABASE_URL. Without it, Senate votes are forgotten when the server stops');
   warmSavedHttp();
 });

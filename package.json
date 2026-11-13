@@ -10,6 +10,11 @@
   "scripts": {
     "start": "node server.js",
     "census": "node scripts/census-counties.js",
+    "db:setup": "node scripts/db-setup.js",
+    "senate:upload": "node scripts/senate-upload.js",
     "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
   }
 }

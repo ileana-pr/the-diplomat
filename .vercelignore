@@ -1,6 +1,7 @@
 .git
 node_modules
 .env
+.env.local
 data/http
 data/senate
 data/raw

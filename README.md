@@ -4,11 +4,12 @@ A personal civic feed. Enter your home address and see your county supervisors, 
 
 ## Run it
 
-You need [Node.js](https://nodejs.org/) 20 or newer. There's nothing to install beyond that.
+You need [Node.js](https://nodejs.org/) 20 or newer.
 
 ```
 cd the-diplomat
 copy .env.example .env      (Windows)   or   cp .env.example .env   (Mac/Linux)
+npm install
 npm start
 ```
 
@@ -16,14 +17,26 @@ Then open http://localhost:3000 and enter your address.
 
 ## Deploy
 
-[Vercel](https://vercel.com) hosts the site. The page files in `public/` are served as-is. A request for `/api/feed` runs `api/feed.js`, which is the same feed as the local server. Senate votes are downloaded from senate.gov while that feed is built.
+[Vercel](https://vercel.com) hosts the site. The page files in `public/` are served as-is. A request for `/api/feed` runs `api/feed.js`, which is the same feed as the local server.
 
 ```
 vercel login
 vercel --prod
 ```
 
-Put `CONGRESS_API_KEY` and `OPENSTATES_API_KEY` in the Vercel project settings. Do not commit `.env`.
+Put `CONGRESS_API_KEY` and `OPENSTATES_API_KEY` in the Vercel project settings. Do not commit `.env` or `.env.local`.
+
+## Database
+
+Senate votes are saved in a Postgres database from [Neon](https://neon.com), connected to the Vercel project. Vercel gives the live site the database address as `DATABASE_URL`. The tables are listed in [db/schema.sql](db/schema.sql).
+
+```
+vercel env pull          writes DATABASE_URL to .env.local, for this computer
+npm run db:setup         creates the tables
+npm run senate:upload    uploads vote files saved in data/senate
+```
+
+All three are safe to run again. Without `DATABASE_URL`, the site still runs and keeps Senate votes in memory until the server stops.
 
 ## API keys (both free)
 
@@ -41,7 +54,7 @@ Put them in `.env`. The site runs without them, with less data.
 | Your districts | U.S. Census geocoder (address to congressional, state senate, state house, county) |
 | Who your members of Congress are | [unitedstates/congress-legislators](https://github.com/unitedstates/congress-legislators) |
 | House votes | Office of the Clerk roll-call XML (latest 20 votes). The yearly index page no longer loads, so the app finds the newest roll-call file directly. |
-| Senate votes | Senate.gov roll-call XML (latest 20 votes), downloaded when the feed is built |
+| Senate votes | Senate.gov roll-call XML for the current session, saved in the database. A visit downloads the list of roll calls at most every 15 minutes, then up to 20 vote files: ones the list shows as changed, then ones not saved yet. A saved file that matches the list is not downloaded again. |
 | Federal bills | Congress.gov API |
 | Virginia General Assembly | Open States / Plural API |
 | Orange County Board of Supervisors | County Agenda Center and News Flash (CivicPlus) |
@@ -58,5 +71,5 @@ County records live in one list, `data/counties.json`. `npm run census` download
 ## Known limits of this first version
 
 - Orange County supervisors are listed as a whole board. The site doesn't yet work out which supervisor district your address is in.
-- House and Senate votes are the latest 20 roll calls. The feed shows 30 cards at a time.
+- House votes are the latest 20 roll calls. Senate votes are every saved roll call in the current session. The feed shows 30 cards at a time.
 - Data is cached in memory for 10 to 60 minutes. Restart the server to refresh right away.
