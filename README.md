@@ -66,7 +66,7 @@ County records live in one list, `data/counties.json`. `npm run census` download
 
 ## Tests
 
-`npm test` runs the feed builder against sample responses shaped like each real service.
+`npm test` runs the feed builder against sample responses shaped like each real service, then a live Census QA that geocodes about 20 real addresses across the country and prints districts plus Congress members. Run only that QA with `npm run qa:addresses` (needs network).
 
 ## Known limits of this first version
 

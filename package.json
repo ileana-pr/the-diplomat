@@ -12,7 +12,8 @@
     "census": "node scripts/census-counties.js",
     "db:setup": "node scripts/db-setup.js",
     "senate:upload": "node scripts/senate-upload.js",
-    "test": "node --test test/*.test.js"
+    "qa:addresses": "node scripts/qa-addresses.js",
+    "test": "node --test test/*.test.js && node scripts/qa-addresses.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0"
